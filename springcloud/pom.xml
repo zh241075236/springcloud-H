@@ -29,6 +29,9 @@
         <spring.data.jpa.version>2.2.3.RELEASE</spring.data.jpa.version>
         <swagger.version>2.9.2</swagger.version>
         <fastjson.version>1.2.4</fastjson.version>
+        <spring.kafka.version>2.6.4</spring.kafka.version>
+        <spring.security.version>2.4.0</spring.security.version>
+        <!--<nacos.config.version>2.1.0.RELEASE</nacos.config.version>-->
     </properties>
 
     <!--子模块继承后,提供作用:锁定版本+子module不用groupId和version-->
@@ -58,6 +61,7 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+
             <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
@@ -68,9 +72,27 @@
                 <artifactId>mybatis-spring-boot-starter</artifactId>
                 <version>${mybatis.spring.boot.version}</version>
             </dependency>
+            <!--<dependency>-->
+                <!--<groupId>com.alibaba.cloud</groupId>-->
+                <!--<artifactId>spring-cloud-alibaba-nacos-config</artifactId>-->
+                <!--<version>${nacos.config.version}</version>-->
+            <!--</dependency>-->
+            <dependency>
+                <groupId>org.springframework.kafka</groupId>
+                <artifactId>spring-kafka</artifactId>
+                <version>${spring.kafka.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-security</artifactId>
+                <version>${spring.security.version}</version>
+            </dependency>
+
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
             </dependency>
 
             <!-- jpa -->
