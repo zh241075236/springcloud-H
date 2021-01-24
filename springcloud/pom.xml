@@ -31,6 +31,7 @@
         <fastjson.version>1.2.4</fastjson.version>
         <spring.kafka.version>2.6.4</spring.kafka.version>
         <spring.security.version>2.4.0</spring.security.version>
+        <jwt.version>0.9.1</jwt.version>
         <!--<nacos.config.version>2.1.0.RELEASE</nacos.config.version>-->
     </properties>
 
@@ -117,6 +118,13 @@
                 <groupId>io.springfox</groupId>
                 <artifactId>springfox-swagger-ui</artifactId>
                 <version>${swagger.version}</version>
+            </dependency>
+
+            <!-- jwt -->
+            <dependency>
+                <groupId>io.jsonwebtoken</groupId>
+                <artifactId>jjwt</artifactId>
+                <version>${jwt.version}</version>
             </dependency>
 
             <dependency>
