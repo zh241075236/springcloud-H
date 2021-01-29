@@ -9,11 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import zh.entity.User;
 import zh.service.UserService;
 
-@RequestMapping(value = "/user")
 @RestController
 @CrossOrigin
-@Api(description = "用户")
-public class UserController {
+@Api(description = "登录")
+public class LoginController {
 
     @Autowired
     private UserService userService;

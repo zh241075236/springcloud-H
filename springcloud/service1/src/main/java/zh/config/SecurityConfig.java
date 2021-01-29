@@ -5,15 +5,15 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.security.web.csrf.HttpSessionCsrfTokenRepository;
+import zh.jwt.JWTAuthenticationFilter;
+import zh.jwt.JWTLoginFilter;
+import zh.service.AuthService;
 import zh.service.UserService;
 
 import javax.sql.DataSource;
@@ -23,7 +23,13 @@ import javax.sql.DataSource;
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     @Autowired
-    DataSource dataSource;
+    private DataSource dataSource;
+
+    @Autowired
+    private UserService userService;
+
+    @Autowired
+    private AuthService authService;
 
     /**
      * 请求拦截
@@ -32,11 +38,11 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        http.authorizeRequests()
-                .antMatchers("/swagger*/**","/webjars/**","/v2/**","/csrf/**","/user/login/**").permitAll()//swagger放行
+        http.cors().and().authorizeRequests()
+                .antMatchers("/static/**","/swagger*/**","/webjars/**","/v2/**","/csrf/**","/user/login/**").permitAll()//请求放行
                 .anyRequest().authenticated()
                 //登录放行
-//                .and().formLogin().loginPage("login.html").loginProcessingUrl("/user/login").permitAll()
+//                .and().formLogin().loginPage("login.html").permitAll()
                 //登录失败页面
 //                .failureUrl("/login.html?error")
                 //失败后处理
@@ -45,32 +51,34 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                })
                 //登录成功后跳转页面
 //                .defaultSuccessUrl("/").permitAll()
-                .and().csrf().csrfTokenRepository(new HttpSessionCsrfTokenRepository());
+                .and().rememberMe().and().csrf().csrfTokenRepository(new HttpSessionCsrfTokenRepository()).and()
+                .addFilter(new JWTLoginFilter(authenticationManager()))//登陆认证，仅登陆拦截
+                .addFilter(new JWTAuthenticationFilter(authenticationManager()))//鉴权，除登陆外都拦截
+                ;
     }
 
     /**
-     * 登录验证
+     * 放行策略
+     * @param web
+     * @throws Exception
+     */
+//    @Override
+//    public void configure(WebSecurity web) throws Exception {
+//        web.ignoring().antMatchers("/static/**");
+//    }
+
+    /**
+     * 登录 鉴权
      * @param auth
      * @throws Exception
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        JdbcUserDetailsManager manager = auth.jdbcAuthentication().dataSource(dataSource).getUserDetailsService();
-        auth.userDetailsService(new UserService());
-        //创建用户并加密
-//        manager.createUser(User.withUsername("root")
-//                .password(new BCryptPasswordEncoder().encode("123"))
-//                .roles("admin")
-//                .build());
+        auth.userDetailsService(userService);
+        auth.authenticationProvider(authService);
+//        JdbcUserDetailsManager manager = auth.jdbcAuthentication().dataSource(dataSource).getUserDetailsService();
+//        auth.userDetailsService(new UserService()).and().authenticationProvider(new AuthService());
     }
-
-
-//    @Bean
-//    protected UserDetailsService userDetailsService() {
-//        JdbcUserDetailsManager manager = new JdbcUserDetailsManager(dataSource);
-//
-//        return manager;
-//    }
 
 
     /**
