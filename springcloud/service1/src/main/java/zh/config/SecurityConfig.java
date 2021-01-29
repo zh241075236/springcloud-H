@@ -16,14 +16,9 @@ import zh.jwt.JWTLoginFilter;
 import zh.service.AuthService;
 import zh.service.UserService;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
-
-    @Autowired
-    private DataSource dataSource;
 
     @Autowired
     private UserService userService;
@@ -39,10 +34,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.cors().and().authorizeRequests()
-                .antMatchers("/static/**","/swagger*/**","/webjars/**","/v2/**","/csrf/**","/user/login/**").permitAll()//请求放行
+//                .antMatchers("/static/**","/swagger*/**","/webjars/**","/v2/**","/csrf/**","/login/**").permitAll()//请求放行
                 .anyRequest().authenticated()
                 //登录放行
-//                .and().formLogin().loginPage("login.html").permitAll()
+                .and().formLogin().loginProcessingUrl("/login").permitAll()//框架默认为/login
                 //登录失败页面
 //                .failureUrl("/login.html?error")
                 //失败后处理
@@ -50,8 +45,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 //                    request.getRequestDispatcher(request.getRequestURL().toString()).forward(request, response);
 //                })
                 //登录成功后跳转页面
-//                .defaultSuccessUrl("/").permitAll()
-                .and().rememberMe().and().csrf().csrfTokenRepository(new HttpSessionCsrfTokenRepository()).and()
+                .and().csrf().csrfTokenRepository(new HttpSessionCsrfTokenRepository()).and()
                 .addFilter(new JWTLoginFilter(authenticationManager()))//登陆认证，仅登陆拦截
                 .addFilter(new JWTAuthenticationFilter(authenticationManager()))//鉴权，除登陆外都拦截
                 ;
@@ -74,10 +68,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
      */
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userService);
-        auth.authenticationProvider(authService);
-//        JdbcUserDetailsManager manager = auth.jdbcAuthentication().dataSource(dataSource).getUserDetailsService();
-//        auth.userDetailsService(new UserService()).and().authenticationProvider(new AuthService());
+        auth.userDetailsService(userService).passwordEncoder(passwordEncoder()).and().authenticationProvider(authService);
     }
 
 

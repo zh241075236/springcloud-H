@@ -4,11 +4,14 @@ import com.alibaba.fastjson.JSON;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import zh.entity.User;
+import zh.service.UserService;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -34,6 +37,9 @@ public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
 
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private UserService userService;
+
     public JWTLoginFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
@@ -51,7 +57,6 @@ public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password, new ArrayList<>()));
-
     }
 
     /**
@@ -68,11 +73,12 @@ public class JWTLoginFilter extends UsernamePasswordAuthenticationFilter {
                                             Authentication auth) throws IOException, ServletException {
         Claims claims = Jwts.claims();
         claims.put("role", auth.getAuthorities().stream().map(s -> s.getAuthority()).collect(Collectors.toList()));
+        //生成jwt
         String token = Jwts.builder()
                 .setClaims(claims)
                 .setSubject(auth.getName())
                 .setExpiration(new Date(System.currentTimeMillis() + 60 * 60 * 24 * 1000))
-                .signWith(SignatureAlgorithm.HS512, "MyJwtSecret11").compact();
+                .signWith(SignatureAlgorithm.HS512, "zhJwtSecret").compact();
         response.setCharacterEncoding("UTF-8");
         response.setContentType("application/json; charset=utf-8");
         //跨域响应头
