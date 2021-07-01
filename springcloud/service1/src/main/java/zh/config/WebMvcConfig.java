@@ -18,6 +18,7 @@ public class WebMvcConfig extends WebMvcConfigurerAdapter {
 //        registry.addResourceHandler("login.html").addResourceLocations("classpath:/static/");
         // swagger访问配置
         registry.addResourceHandler("swagger-ui.html").addResourceLocations("classpath:/META-INF/resources/","classpath:/META-INF/resources/webjars/");
+        registry.addResourceHandler("/image/**").addResourceLocations("file:e:/image/");
 //        registry.addResourceHandler("swagger").addResourceLocations("classpath:");
     }
 }

@@ -1,0 +1,16 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: service2
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.253.130:8848
+      config:
+        server-addr: 192.168.253.130:8848
+        file-extension: yaml
+        namespace: eca901c5-d91c-40ed-b483-f939d38b95a2
+
+  profiles:
+    active: dev
