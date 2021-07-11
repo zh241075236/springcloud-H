@@ -1,6 +1,6 @@
 package zh.test;
 
-import zh.annoation.TestAnnoation;
+import zh.annotation.TestAnnoation;
 
 
 public class Test {
